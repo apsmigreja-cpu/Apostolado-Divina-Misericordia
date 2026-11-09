@@ -1,0 +1,54 @@
+{
+  "entities": {
+    "Post": {
+      "title": "Publicação",
+      "description": "Uma atualização ou notícia sobre a Divina Misericórdia.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "O título da publicação." },
+        "content": { "type": "string", "description": "O conteúdo em markdown ou texto simples." },
+        "date": { "type": "string", "format": "date-time", "description": "A data da publicação." },
+        "imageUrl": { "type": "string", "description": "URL de uma imagem opcional." },
+        "author": { "type": "string", "description": "Nome do autor." }
+      },
+      "required": ["title", "content", "date"]
+    },
+    "Prayer": {
+      "title": "Oração",
+      "description": "Uma oração dedicada à Divina Misericórdia.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "O título da oração." },
+        "text": { "type": "string", "description": "O texto completo da oração." },
+        "category": { "type": "string", "description": "Categoria (ex: Terço, Novena)." }
+      },
+      "required": ["title", "text"]
+    },
+    "GalleryItem": {
+      "title": "Item da Galeria",
+      "description": "Um item de mídia (imagem ou vídeo).",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Título ou descrição curta." },
+        "type": { "type": "string", "enum": ["image", "video"], "description": "Tipo de mídia." },
+        "url": { "type": "string", "description": "URL do recurso." },
+        "thumbnail": { "type": "string", "description": "URL da miniatura (para vídeos)." }
+      },
+      "required": ["title", "type", "url"]
+    }
+  },
+  "firestore": {
+    "/posts/{postId}": {
+      "schema": "Post",
+      "description": "Coleção de atualizações e notícias."
+    },
+    "/prayers/{prayerId}": {
+      "schema": "Prayer",
+      "description": "Coleção de orações."
+    },
+    "/gallery/{itemId}": {
+      "schema": "GalleryItem",
+      "description": "Coleção de itens de mídia."
+    }
+  }
+}

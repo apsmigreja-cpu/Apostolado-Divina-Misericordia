@@ -1,0 +1,6 @@
+{
+  "name": "Divina Misericórdia",
+  "description": "Um portal dedicado à divulgação da devoção à Divina Misericórdia, Santa Faustina e João Paulo II.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

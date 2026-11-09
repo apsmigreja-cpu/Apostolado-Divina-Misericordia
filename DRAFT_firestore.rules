@@ -1,0 +1,37 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Common helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Note: In this public-facing site, anyone can read the content.
+    // Writes should normally be restricted to admins.
+    // For this prototype, I'll allow reads to all and writes if signed in (simulating an admin).
+    
+    match /posts/{postId} {
+      allow read: if true;
+      allow create, update, delete: if isSignedIn();
+    }
+
+    match /prayers/{prayerId} {
+      allow read: if true;
+      allow create, update, delete: if isSignedIn();
+    }
+
+    match /gallery/{itemId} {
+      allow read: if true;
+      allow create, update, delete: if isSignedIn();
+    }
+  }
+}

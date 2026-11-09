@@ -1,0 +1,59 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Global Helpers
+    function isSignedIn() { return request.auth != null; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function incoming() { return request.resource.data; }
+    
+    // Auth Token Integrity (Email Verification)
+    function isVerified() { return isSignedIn() && request.auth.token.email_verified == true; }
+
+    // Validation Blueprints
+    function isValidPost(data) {
+      return data.title is string && data.title.size() <= 200 &&
+             data.content is string && data.content.size() <= 10000 &&
+             data.date is string;
+    }
+
+    function isValidPrayer(data) {
+      return data.title is string && data.title.size() <= 200 &&
+             data.text is string && data.text.size() <= 5000;
+    }
+
+    function isValidGalleryItem(data) {
+      return data.title is string && data.title.size() <= 200 &&
+             data.type in ['image', 'video'] &&
+             data.url is string && data.url.size() <= 1000;
+    }
+
+    // Match blocks
+    match /posts/{postId} {
+      allow read: if true;
+      allow create: if isVerified() && isValidId(postId) && isValidPost(incoming());
+      allow update: if isVerified() && isValidId(postId) && isValidPost(incoming()) && 
+                    (incoming().diff(resource.data).affectedKeys().hasOnly(['title', 'content', 'imageUrl', 'date']));
+      allow delete: if isVerified();
+    }
+
+    match /prayers/{prayerId} {
+      allow read: if true;
+      allow create: if isVerified() && isValidId(prayerId) && isValidPrayer(incoming());
+      allow update: if isVerified() && isValidId(prayerId) && isValidPrayer(incoming()) &&
+                    (incoming().diff(resource.data).affectedKeys().hasOnly(['title', 'text', 'category']));
+      allow delete: if isVerified();
+    }
+
+    match /gallery/{itemId} {
+      allow read: if true;
+      allow create: if isVerified() && isValidId(itemId) && isValidGalleryItem(incoming());
+      allow update: if isVerified() && isValidId(itemId) && isValidGalleryItem(incoming());
+      allow delete: if isVerified();
+    }
+  }
+}
